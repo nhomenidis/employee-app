@@ -1,13 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+﻿using Employee.Business.DTOs;
+using Employee.Business.Mappers;
+using Employee.Business.Services;
+using Employee.DataContext;
+using Employee.DataContext.Repositories;
+using Employee.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Options;
+using Swashbuckle.AspNetCore.Swagger;
+
 
 namespace Employee.Api
 {
@@ -23,7 +26,26 @@ namespace Employee.Api
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            services.AddDbContext<EmployeeDataContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
+
             services.AddMvc();
+
+            services.AddScoped<IEmployeeService, EmployeeService>();
+            services.AddScoped<IEmployeeRepository, EmployeeRepository>();
+
+            services.AddScoped<ISkillService, SkillService>();
+            services.AddScoped<ISkillRepository, SkillRepository>();
+
+            services.AddScoped<IMapper<Models.Employee, EmployeeDto>, EmployeeDtoMapper>();
+            services.AddScoped<IMapper<Skill, SkillDto>, SkillDtoMapper>();
+            services.AddScoped<IMapper<CreateSkillDto, Skill>, CreateSkillDtoMapper>();
+            services.AddScoped<IMapper<CreateEmployeeDto, Models.Employee>, CreateEmployeeDtoMapper>();
+
+            services.AddSwaggerGen(c =>
+            {
+                c.SwaggerDoc("v1", new Info { Title = "Students API", Version = "v1" });
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
@@ -33,6 +55,26 @@ namespace Employee.Api
             {
                 app.UseDeveloperExceptionPage();
             }
+
+            app.UseCors(corsPolicyBuilder =>
+            {
+                corsPolicyBuilder
+                    .AllowAnyMethod()
+                    .AllowAnyHeader()
+                    .AllowAnyOrigin()
+                    .AllowCredentials();
+            });
+
+            // Enable middleware to serve generated Swagger as a JSON endpoint.
+            app.UseSwagger();
+
+            // Enable middleware to serve swagger-ui (HTML, JS, CSS, etc.), specifying the Swagger JSON endpoint.
+            app.UseSwaggerUI(c =>
+            {
+                c.SwaggerEndpoint("/swagger/v1/swagger.json", "Student API V1");
+            });
+
+            app.UseStaticFiles();
 
             app.UseMvc();
         }
