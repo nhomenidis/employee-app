@@ -5,11 +5,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <Folder Include="Mappers\" />
-    <Folder Include="Services\" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Employee.DataContext\Employee.DataContext.csproj" />
     <ProjectReference Include="..\Employee.Models\Employee.Models.csproj" />
   </ItemGroup>
