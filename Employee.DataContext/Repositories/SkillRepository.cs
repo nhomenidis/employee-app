@@ -10,7 +10,7 @@ namespace Employee.DataContext.Repositories
 {
     public interface ISkillRepository : IRepository<Skill>
     {
-        
+        Task<IEnumerable<Skill>> GetSkillsByEmployeeId(Guid employeeId);
     }
     public class SkillRepository : BaseRepository<Skill>, ISkillRepository
     {
