@@ -38,10 +38,24 @@ namespace Employee.Api.Controllers
             return Ok(result);
         }
 
+        [HttpDelete]
+        public async Task<IActionResult> DeleteAll()
+        {
+            var result = await _employeeService.DeleteAllEntities();
+            return Ok(result);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetbyId(Guid id)
         {
             var result = await _employeeService.GetEntity(id);
+            return Ok(result);
+        }
+
+        [HttpPut("{id}")]
+        public async Task<IActionResult> Update(Guid id,[FromBody]EmployeeDto employeeDto)
+        {
+            var result = await _employeeService.UpdateEmployee(id, employeeDto);
             return Ok(result);
         }
 
