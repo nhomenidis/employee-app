@@ -10,7 +10,7 @@ namespace Employee.Business.Mappers
         {
             return new EmployeeDto()
             {
-                Id = employee.Id,
+                EmployeeId = employee.Id,
                 FirstName = employee.FirstName,
                 LastName = employee.LastName,
                 Email = employee.Email,

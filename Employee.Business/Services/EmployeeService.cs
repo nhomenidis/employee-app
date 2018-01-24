@@ -40,7 +40,7 @@ namespace Employee.Business.Services
 
         public async Task<EmployeeDto> UpdateEmployee(Guid id, EmployeeDto employeeDto)
         {
-            employeeDto.Id = id;
+            employeeDto.EmployeeId = id;
             var mapped = _employeeDtoMapper.Map(employeeDto);
             var updatedEmployee = await _employeeRepository.Update(id, mapped);
             return _employeeMapper.Map(updatedEmployee);
