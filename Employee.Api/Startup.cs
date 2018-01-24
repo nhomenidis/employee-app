@@ -10,6 +10,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Swashbuckle.AspNetCore.Swagger;
+using Employee = Employee.Models.Employee;
 
 
 namespace Employee.Api
@@ -41,6 +42,7 @@ namespace Employee.Api
             services.AddScoped<IMapper<Skill, SkillDto>, SkillDtoMapper>();
             services.AddScoped<IMapper<CreateSkillDto, Skill>, CreateSkillDtoMapper>();
             services.AddScoped<IMapper<CreateEmployeeDto, Models.Employee>, CreateEmployeeDtoMapper>();
+            services.AddScoped<IMapper<EmployeeDto, Models.Employee>, EmployeeMapper>();
 
             services.AddSwaggerGen(c =>
             {
@@ -51,11 +53,6 @@ namespace Employee.Api
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
         public void Configure(IApplicationBuilder app, IHostingEnvironment env)
         {
-            if (env.IsDevelopment())
-            {
-                app.UseDeveloperExceptionPage();
-            }
-
             app.UseCors(corsPolicyBuilder =>
             {
                 corsPolicyBuilder
@@ -64,6 +61,11 @@ namespace Employee.Api
                     .AllowAnyOrigin()
                     .AllowCredentials();
             });
+
+            if (env.IsDevelopment())
+            {
+                app.UseDeveloperExceptionPage();
+            }
 
             // Enable middleware to serve generated Swagger as a JSON endpoint.
             app.UseSwagger();
