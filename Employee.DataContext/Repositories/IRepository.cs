@@ -11,7 +11,8 @@ namespace Employee.DataContext.Repositories
         Task<IEnumerable<T>> GetAll();
         Task<T> Insert(T entity);
         Task<bool> InsertMany(IEnumerable<T> entities);
-        Task<T> Update(T entity);
+        Task<T> Update(Guid id, T entity);
         Task<bool> Delete(Guid id);
+        Task<bool> DeleteAll();
     }
 }

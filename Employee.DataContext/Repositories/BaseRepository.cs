@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
@@ -33,11 +34,12 @@ namespace Employee.DataContext.Repositories
             return result.Entity;
         }
 
-        public virtual async Task<T> Update(T entity)
+        public virtual async Task<T> Update(Guid id, T entity)
         {
-            var result = DbSet.Update(entity);
+            var result = await EmployeeDataContext.FindAsync<T>(id);
+            EmployeeDataContext.Entry(result).CurrentValues.SetValues(entity);
             await EmployeeDataContext.SaveChangesAsync();
-            return result.Entity;
+            return result;
         }
 
         public virtual async Task<bool> Delete(Guid id)
@@ -46,6 +48,13 @@ namespace Employee.DataContext.Repositories
             DbSet.Remove(entity);
             await EmployeeDataContext.SaveChangesAsync();
             return true;
+        }
+
+        public virtual async Task<bool> DeleteAll()
+        {
+           EmployeeDataContext.RemoveRange(DbSet);
+           await EmployeeDataContext.SaveChangesAsync();
+           return true;
         }
 
         public virtual async Task<bool> InsertMany(IEnumerable<T> entities)

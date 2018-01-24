@@ -12,6 +12,7 @@ namespace Employee.DataContext.Repositories
     {
         public EmployeeRepository(EmployeeDataContext employeeDataContext) : base(employeeDataContext)
         {
+
         }
     }
 }
