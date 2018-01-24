@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-using Employee.Models;
+﻿using Employee.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Employee.DataContext
@@ -26,7 +23,10 @@ namespace Employee.DataContext
                 .OnDelete(DeleteBehavior.Cascade);
 
             employee
-                .HasIndex(e => new { e.FirstName, e.LastName, e.Email })
+                .HasIndex(e => new { e.FirstName, e.LastName})
+                .IsUnique();
+            employee
+                .HasIndex(e => new {e.Email})
                 .IsUnique();
 
             employee
