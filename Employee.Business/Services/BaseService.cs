@@ -44,6 +44,12 @@ namespace Employee.Business.Services
             return deleteEntity;
         }
 
+        public async Task<bool> DeleteAllEntities()
+        {
+            var result = await _repository.DeleteAll();
+            return result;
+        }
+
         public async Task<bool> InsertMany(IEnumerable<T> entities)
         {
             var result = await _repository.InsertMany(entities);

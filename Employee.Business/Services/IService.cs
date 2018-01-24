@@ -10,6 +10,7 @@ namespace Employee.Business.Services
         Task<IEnumerable<TOutput>> GetAllEntities();
         Task<TOutput> CreateEntity(T entity);
         Task<bool> DeleteEntity(Guid id);
+        Task<bool> DeleteAllEntities();
         Task<bool> InsertMany(IEnumerable<T> entities);
     }
 }
