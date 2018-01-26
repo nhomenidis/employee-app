@@ -45,17 +45,17 @@ namespace Employee.Api.Controllers
             return Ok(result);
         }
 
-        [HttpGet("{id}")]
-        public async Task<IActionResult> GetbyId(Guid id)
+        [HttpGet("{employeeId}")]
+        public async Task<IActionResult> GetbyId(Guid employeeId)
         {
-            var result = await _employeeService.GetEntity(id);
+            var result = await _employeeService.GetEntity(employeeId);
             return Ok(result);
         }
 
-        [HttpPut("{id}")]
-        public async Task<IActionResult> Update(Guid id,[FromBody]EmployeeDto employeeDto)
+        [HttpPut("{employeeId}")]
+        public async Task<IActionResult> Update(Guid employeeId,[FromBody]EmployeeDto employeeDto)
         {
-            var result = await _employeeService.UpdateEmployee(id, employeeDto);
+            var result = await _employeeService.UpdateEmployee(employeeId, employeeDto);
             return Ok(result);
         }
 
