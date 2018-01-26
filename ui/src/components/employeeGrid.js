@@ -12,7 +12,7 @@ class EmployeeGrid extends Component {
             rows: [],
         };
         this._handleSkillClick = this._handleSkillClick.bind(this);
-        
+        this._handleEditClick = this._handleEditClick.bind(this);        
     }
 
     _columns = [
@@ -21,12 +21,17 @@ class EmployeeGrid extends Component {
         { key: 'dateOfBirth', name: 'Birthdate', resizable: true },
         { key: 'address', name: 'Address', resizable: true },
         { key: 'email', name: 'Email', resizable: true },
+        { key: 'skills', name: 'Skills', resizable: true},
         { key: 'actions', name: '', resizable: true },
-        { key: 'skills', name: 'Skills', resizable: true}
     ];
 
+    _handleEditClick(employeeId) {
+        this.props.onEditClick(employeeId);
+        
+    }
+
     _handleSkillClick(employeeId) {
-        this.props.onCreateSkillClick(this.props.employeeId);
+        this.props.onCreateSkillClick(employeeId);
     }
 
     _deleteEmployee = async (employeeId) => {
@@ -36,13 +41,13 @@ class EmployeeGrid extends Component {
 
     _actions = (employeeId) => <Row>
         <Col sm={3}>
-            <Button bsStyle="primary">Edit</Button>
+            <Button bsStyle="primary" onClick={async () => await this._handleEditClick(employeeId)}>Edit</Button>
         </Col>
         <Col sm={3}>
             <Button bsStyle="danger" onClick={async () => await this._deleteEmployee(employeeId)}>Delete</Button>
         </Col>
         <Col sm={6}>
-            <Button bsStyle="warning" onClick={async () => await this._handleSkillClick(employeeId)}>Create Skill</Button>
+            <Button bsStyle="warning" onClick={async () => await this._handleSkillClick(employeeId)}>Add Skill</Button>
         </Col>
     </Row>
 
