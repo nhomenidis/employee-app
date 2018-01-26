@@ -10,6 +10,18 @@ function getEmployees() {
         .then(checkStatus);
 }
 
+function getEmployeeById(employeeId) {
+    return fetch(`http://localhost:49513/employee/${employeeId}`, {
+        method: 'get',
+        mode: 'cors',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+        .then(checkStatus);
+}
+
 function deleteEmployee(employeeId) {
     return fetch(`http://localhost:49513/employee/${employeeId}`, {
         method: 'delete',
@@ -47,6 +59,19 @@ function createEmployee(request){
         .then(checkStatus);
 }
 
+function updateEmployee(employeeId, request){
+    return fetch(`http://localhost:49513/employee/${employeeId}`,{
+        method: 'put',
+        body: JSON.stringify(request),
+        mode: 'cors',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+        .then(checkStatus);
+}
+
 function createSkill(request){
     return fetch(`http://localhost:49513/skill/create`,{
     method: 'post',
@@ -59,6 +84,7 @@ function createSkill(request){
     })
         .then(checkStatus);
 }
+
 
 function checkStatus(response) {
     if (response.status >= 200 && response.status < 300) {
@@ -76,4 +102,4 @@ function checkStatus(response) {
     }
 }
 
-export { getEmployees, deleteEmployee, createEmployee, createSkill, deleteAll }
+export { getEmployees, deleteEmployee, createEmployee, createSkill, deleteAll, getEmployeeById, updateEmployee }
