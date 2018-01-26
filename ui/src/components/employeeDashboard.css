@@ -1,0 +1,10 @@
+ul {
+    margin: 3em 0;
+  }
+li{
+    content: '\f006';
+    font-family: 'FontAwesome';
+    float: center;
+    margin-left: 0em;
+    color: rgb(40, 124, 117);
+  }
