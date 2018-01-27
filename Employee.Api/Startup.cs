@@ -43,6 +43,7 @@ namespace Employee.Api
             services.AddScoped<IMapper<CreateSkillDto, Skill>, CreateSkillDtoMapper>();
             services.AddScoped<IMapper<CreateEmployeeDto, Models.Employee>, CreateEmployeeDtoMapper>();
             services.AddScoped<IMapper<EmployeeDto, Models.Employee>, EmployeeMapper>();
+            services.AddScoped<IMapper<SkillDto, Skill>, SkillMapper>();
 
             services.AddSwaggerGen(c =>
             {

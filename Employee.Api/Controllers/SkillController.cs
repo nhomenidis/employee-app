@@ -57,6 +57,17 @@ namespace Employee.Api.Controllers
             return Ok(result);
         }
 
+        [HttpPut("{skillId}")]
+        public async Task<IActionResult> Update(Guid skillId, [FromBody]SkillDto skillDto)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+            var result = await _skillService.UpdateSkill(skillId, skillDto);
+            return Ok(result);
+        }
+
         [HttpGet("{id}")]
         public async Task<IActionResult> GetbyId(Guid id)
         {
