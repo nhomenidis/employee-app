@@ -55,6 +55,10 @@ namespace Employee.Api.Controllers
         [HttpPut("{employeeId}")]
         public async Task<IActionResult> Update(Guid employeeId,[FromBody]EmployeeDto employeeDto)
         {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
             var result = await _employeeService.UpdateEmployee(employeeId, employeeDto);
             return Ok(result);
         }
