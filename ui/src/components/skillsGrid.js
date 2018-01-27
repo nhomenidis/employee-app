@@ -1,33 +1,27 @@
 import React, { Component } from 'react';
 import { Button, Grid, Row, Col } from 'react-bootstrap'
 import ReactDataGrid from 'react-data-grid'
-import { getEmployees, deleteEmployee, createSkill } from '../api/calls'
-import {SkillModal} from './SkillModal'
-import {SkillsGrid} from './skillsGrid'
+import { getEmployees, deleteEmployee, createSkill, getSkillsByEmployeeId } from '../api/calls'
 
-class EmployeeGrid extends Component {
+class SkillsGrid extends Component {
 
     constructor(props) {
         super(props);
         this.state = {
             rows: [],
         };
-        this._handleSkillClick = this._handleSkillClick.bind(this);
-        this._handleEditClick = this._handleEditClick.bind(this);        
+        // this._handleSkillClick = this._handleSkillClick.bind(this);
+        // this._handleEditClick = this._handleEditClick.bind(this);        
     }
 
     _columns = [
-        { key: 'firstName', name: 'First Name', resizable: true },
-        { key: 'lastName', name: 'Last Name', resizable: true },
-        { key: 'dateOfBirth', name: 'Birthdate', resizable: true },
-        { key: 'address', name: 'Address', resizable: true },
-        { key: 'email', name: 'Email', resizable: true },
-        { key: 'skills', name: 'Skills', resizable: true},
+        { key: 'Name', name: 'Skill Name', resizable: true },
+        { key: 'Category', name: 'Skill Category', resizable: true },
         { key: 'actions', name: '', resizable: true },
     ];
 
     _handleEditClick(employeeId) {
-        this.props.onEditClick(employeeId);        
+        this.props.onEditClick(employeeId);
     }
 
     _handleSkillClick(employeeId) {
@@ -46,21 +40,21 @@ class EmployeeGrid extends Component {
         <Col sm={3}>
             <Button bsStyle="danger" onClick={async () => await this._deleteEmployee(employeeId)}>Delete</Button>
         </Col>
-        <Col sm={6}>
-            <Button bsStyle="warning" onClick={async () => await this._handleSkillClick(employeeId)}>Add Skill</Button>
-        </Col>
     </Row>
 
-    
+
 
     refreshGrid = async () => {
+        var skills = [];
         var response = await getEmployees();
+        var skillResponse = await getSkillsByEmployeeId(response.employeeId);; 
         response.forEach(element => {
             element.actions = this._actions(element.employeeId);
+            skills.push(skillResponse);
         });
         this.setState({
-            rows: response
-        })
+            rows: skills
+        });
     }
 
     async componentDidMount() {
@@ -70,16 +64,15 @@ class EmployeeGrid extends Component {
     render() {
         return (
             <div>
-            <ReactDataGrid
-                columns={this._columns}
-                rowGetter={(i) => this.state.rows[i]}
-                rowsCount={this.state.rows.length}
-                minHeight={500}
-            />
-            <SkillsGrid />
+                <ReactDataGrid
+                    columns={this._columns}
+                    rowGetter={(i) => this.state.rows[i]}
+                    rowsCount={this.state.rows.length}
+                    minHeight={500}
+                />
             </div>
         )
     }
 }
 
-export { EmployeeGrid };
+export { SkillsGrid };
