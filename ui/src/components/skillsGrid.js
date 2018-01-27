@@ -7,11 +7,7 @@ class SkillsGrid extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            rows: [],
-        };
-        // this._handleSkillClick = this._handleSkillClick.bind(this);
-        // this._handleEditClick = this._handleEditClick.bind(this);        
+             
     }
 
     _columns = [
@@ -43,31 +39,13 @@ class SkillsGrid extends Component {
     </Row>
 
 
-
-    refreshGrid = async () => {
-        var skills = [];
-        var response = await getEmployees();
-        var skillResponse = await getSkillsByEmployeeId(response.employeeId);; 
-        response.forEach(element => {
-            element.actions = this._actions(element.employeeId);
-            skills.push(skillResponse);
-        });
-        this.setState({
-            rows: skills
-        });
-    }
-
-    async componentDidMount() {
-        await this.refreshGrid();
-    }
-
     render() {
         return (
             <div>
                 <ReactDataGrid
                     columns={this._columns}
-                    rowGetter={(i) => this.state.rows[i]}
-                    rowsCount={this.state.rows.length}
+                    rowGetter={(i) => this.props.rows[i]}
+                    rowsCount={this.props.rows.length}
                     minHeight={500}
                 />
             </div>
