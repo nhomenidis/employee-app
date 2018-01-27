@@ -85,6 +85,18 @@ function createSkill(request){
         .then(checkStatus);
 }
 
+function getSkillsByEmployeeId(employeeId){
+    return fetch(`http://localhost:49513/employee/${employeeId}/skills`,{
+        method: 'get',
+            mode: 'cors',
+            headers: {
+                'Accept': 'application/json',
+                'Content-Type': 'application/json',
+            },
+        })
+            .then(checkStatus);
+}
+
 
 function checkStatus(response) {
     if (response.status >= 200 && response.status < 300) {
@@ -102,4 +114,4 @@ function checkStatus(response) {
     }
 }
 
-export { getEmployees, deleteEmployee, createEmployee, createSkill, deleteAll, getEmployeeById, updateEmployee }
+export { getEmployees, deleteEmployee, createEmployee, createSkill, deleteAll, getEmployeeById, updateEmployee, getSkillsByEmployeeId }
