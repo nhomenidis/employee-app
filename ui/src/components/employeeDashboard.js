@@ -2,7 +2,7 @@ import React, { Component } from 'react';
 import './employeeDashboard.css'
 import { Grid, Row, Col, Button, Jumbotron, Modal, Form, FormControl, ControlLabel } from 'react-bootstrap';
 import { EmployeeGrid } from './employeeGrid'
-import { createEmployee, createSkill, deleteAll, getEmployeeById, updateEmployee } from '../api/calls'
+import { createEmployee, createSkill, deleteAll, getEmployeeById, updateEmployee, deleteEmployee, getEmployees} from '../api/calls'
 
 class EmployeeDashboard extends Component {
 
@@ -22,14 +22,42 @@ class EmployeeDashboard extends Component {
             employeeId: '',
 
             showAddSkillModal: false,
-            showEditModal: false
+            showEditModal: false,
+
+            rows: []
         };
 
-        this.handleCreateSkillClick = this.handleCreateSkillClick.bind(this);
-        this.handleEditClick = this.handleEditClick.bind(this);
     }
 
-    handleEditClick = async (employeeId) => {
+    _actions = (employeeId) => <Row>
+        <Col sm={3}>
+            <Button bsStyle="primary" onClick={async () => await this._handleEditClick(employeeId)}>Edit</Button>
+        </Col>
+        <Col sm={3}>
+            <Button bsStyle="danger" onClick={async () => await this._deleteEmployee(employeeId)}>Delete</Button>
+        </Col>
+        <Col sm={6}>
+            <Button bsStyle="warning" onClick={async () => await this._handleCreateSkillClick(employeeId)}>Add Skill</Button>
+        </Col>
+    </Row>
+
+    
+
+    refreshGrid = async () => {
+        var response = await getEmployees();
+        response.forEach(element => {
+            element.actions = this._actions(element.employeeId);
+        });
+        this.setState({
+            rows: response
+        })
+    }
+
+    async componentDidMount() {
+        await this.refreshGrid();
+    }
+
+    _handleEditClick = async (employeeId) => {
 
         const response = await getEmployeeById(employeeId);
         this.setState({
@@ -43,13 +71,16 @@ class EmployeeDashboard extends Component {
         })
     };
 
-    handleCreateSkillClick = (employeeId) => {
+    _handleCreateSkillClick = (employeeId) => {
 
         this.setState({ showAddSkillModal: true })
         this.setState({ employeeId: employeeId })
     };
 
-    
+    _deleteEmployee = async (employeeId) => {
+        await deleteEmployee(employeeId);
+        await this.refreshGrid();
+    }
 
     _createEmployee = async () => {
         const request = {
@@ -83,6 +114,7 @@ class EmployeeDashboard extends Component {
             .then(alert('Employee with skills was successfully created!!'));
         this.setState({ showModal: false });
         }
+        await this.refreshGrid();
     }
 
 
@@ -103,12 +135,13 @@ class EmployeeDashboard extends Component {
         }
         alert('Employee was updated successfully!!');
         this.setState({showEditModal: false});
+        await this.refreshGrid();
     }
 
 
     _deleteAllEmployees = async () => {
         await deleteAll();
-        await this.refreshGrid;
+        await this.refreshGrid();
     }
 
     _createSkill = async () => {
@@ -366,6 +399,7 @@ class EmployeeDashboard extends Component {
                             <EmployeeGrid
                                 onCreateSkillClick={this.handleCreateSkillClick}
                                 onEditClick={this.handleEditClick}
+                                rows={this.state.rows}
                             />
                         </Col>
                     </Row>

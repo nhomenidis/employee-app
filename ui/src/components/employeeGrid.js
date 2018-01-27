@@ -10,13 +10,11 @@ class EmployeeGrid extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            rows: [],
-        };
-        this._handleSkillClick = this._handleSkillClick.bind(this);
-        this._handleEditClick = this._handleEditClick.bind(this);        
+            skillRows: [],
+        };       
     }
-
-    _columns = [
+ 
+    _columns = [ // id column hidden
         { key: 'firstName', name: 'First Name', resizable: true },
         { key: 'lastName', name: 'Last Name', resizable: true },
         { key: 'dateOfBirth', name: 'Birthdate', resizable: true },
@@ -26,57 +24,45 @@ class EmployeeGrid extends Component {
         { key: 'actions', name: '', resizable: true },
     ];
 
-    _handleEditClick(employeeId) {
-        this.props.onEditClick(employeeId);        
+    _onRowSelect = (event) => {
+        alert(event);
+        // event => row employee ID
+        // api call getskillsbyEmployeeId
+        // this.setState {skillRows: result}
     }
 
-    _handleSkillClick(employeeId) {
-        this.props.onCreateSkillClick(employeeId);
-    }
-
-    _deleteEmployee = async (employeeId) => {
-        await deleteEmployee(employeeId);
-        await this.refreshGrid();
-    }
-
-    _actions = (employeeId) => <Row>
-        <Col sm={3}>
-            <Button bsStyle="primary" onClick={async () => await this._handleEditClick(employeeId)}>Edit</Button>
-        </Col>
-        <Col sm={3}>
-            <Button bsStyle="danger" onClick={async () => await this._deleteEmployee(employeeId)}>Delete</Button>
-        </Col>
-        <Col sm={6}>
-            <Button bsStyle="warning" onClick={async () => await this._handleSkillClick(employeeId)}>Add Skill</Button>
-        </Col>
-    </Row>
-
+    onRowsSelected = (rows) => {
+        this.setState({selectedIndexes: this.state.selectedIndexes.concat(rows.map(r => r.rowIdx))});
+      };
     
-
-    refreshGrid = async () => {
-        var response = await getEmployees();
-        response.forEach(element => {
-            element.actions = this._actions(element.employeeId);
-        });
-        this.setState({
-            rows: response
-        })
-    }
-
-    async componentDidMount() {
-        await this.refreshGrid();
-    }
+    onRowsDeselected = (rows) => {
+        let rowIndexes = rows.map(r => r.rowIdx);
+        this.setState({selectedIndexes: this.state.selectedIndexes.filter(i => rowIndexes.indexOf(i) === -1 )});
+      };
 
     render() {
         return (
             <div>
             <ReactDataGrid
                 columns={this._columns}
-                rowGetter={(i) => this.state.rows[i]}
-                rowsCount={this.state.rows.length}
+                rowGetter={(i) => this.props.rows[i]}
+                rowsCount={this.props.rows.length}
                 minHeight={500}
+                rowSelection={
+                    {
+                    showCheckbox: true,
+                    onRowsSelected: this._onRowsSelected,
+                    onRowsDeselected: this.onRowsDeselected,
+                    selectBy: {
+                      indexes: this.state.selectedIndexes
+                    }}
+                    }
+                    //this._onRowSelect,
+
             />
-            <SkillsGrid />
+            <SkillsGrid
+                rows={this.state.skillRows}
+            />
             </div>
         )
     }
