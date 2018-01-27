@@ -18,7 +18,7 @@ namespace Employee.Business.DTOs
 
         [Required]
         [Age(18)]
-        public DateTime DateOfBirth { get; set; }
+        public DateTime BirthDate { get; set; }
 
         public string Address { get; set; }
     }
