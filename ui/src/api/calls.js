@@ -10,8 +10,32 @@ function getEmployees() {
         .then(checkStatus);
 }
 
+function getAllSkills() {
+    return fetch(`http://localhost:49513/skill`, {
+        method: 'get',
+        mode: 'cors',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+        .then(checkStatus);
+}
+
 function getEmployeeById(employeeId) {
     return fetch(`http://localhost:49513/employee/${employeeId}`, {
+        method: 'get',
+        mode: 'cors',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+        .then(checkStatus);
+}
+
+function getSkillById(skillId) {
+    return fetch(`http://localhost:49513/skill/${skillId}`, {
         method: 'get',
         mode: 'cors',
         headers: {
@@ -34,6 +58,19 @@ function deleteEmployee(employeeId) {
         .then(checkStatus);
 }
 
+function deleteSkill(skillId) {
+    return fetch(`http://localhost:49513/skill/${skillId}`, {
+        method: 'delete',
+        mode: 'cors',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+        .then(checkStatus);
+}
+
+
 function deleteAll() {
     return fetch(`http://localhost:49513/employee`, {
         method: 'delete',
@@ -46,8 +83,8 @@ function deleteAll() {
         .then(checkStatus);
 }
 
-function createEmployee(request){
-    return fetch(`http://localhost:49513/employee`,{
+function createEmployee(request) {
+    return fetch(`http://localhost:49513/employee`, {
         method: 'post',
         body: JSON.stringify(request),
         mode: 'cors',
@@ -59,8 +96,8 @@ function createEmployee(request){
         .then(checkStatus);
 }
 
-function updateEmployee(employeeId, request){
-    return fetch(`http://localhost:49513/employee/${employeeId}`,{
+function updateEmployee(employeeId, request) {
+    return fetch(`http://localhost:49513/employee/${employeeId}`, {
         method: 'put',
         body: JSON.stringify(request),
         mode: 'cors',
@@ -72,9 +109,9 @@ function updateEmployee(employeeId, request){
         .then(checkStatus);
 }
 
-function createSkill(request){
-    return fetch(`http://localhost:49513/skill/create`,{
-    method: 'post',
+function updateSkill(SkillId, request) {
+    return fetch(`http://localhost:49513/skill/${SkillId}`, {
+        method: 'put',
         body: JSON.stringify(request),
         mode: 'cors',
         headers: {
@@ -85,16 +122,29 @@ function createSkill(request){
         .then(checkStatus);
 }
 
-function getSkillsByEmployeeId(employeeId){
-    return fetch(`http://localhost:49513/employee/${employeeId}/skills`,{
+function createSkill(request) {
+    return fetch(`http://localhost:49513/skill/create`, {
+        method: 'post',
+        body: JSON.stringify(request),
+        mode: 'cors',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+        .then(checkStatus);
+}
+
+function getSkillsByEmployeeId(employeeId) {
+    return fetch(`http://localhost:49513/employee/${employeeId}/skills`, {
         method: 'get',
-            mode: 'cors',
-            headers: {
-                'Accept': 'application/json',
-                'Content-Type': 'application/json',
-            },
-        })
-            .then(checkStatus);
+        mode: 'cors',
+        headers: {
+            'Accept': 'application/json',
+            'Content-Type': 'application/json',
+        },
+    })
+        .then(checkStatus);
 }
 
 
@@ -106,12 +156,15 @@ function checkStatus(response) {
         error.status = response.statusText;
         error.response = response;
         console.log(error);
-        if(response.status === 400){
+        if (response.status === 400) {
             response.json()
-            .then((body) => alert(JSON.stringify(body)));
+                .then((body) => alert(JSON.stringify(body)));
         }
         //throw error;
     }
 }
 
-export { getEmployees, deleteEmployee, createEmployee, createSkill, deleteAll, getEmployeeById, updateEmployee, getSkillsByEmployeeId }
+export {
+    getEmployees, deleteEmployee, createEmployee, createSkill, deleteAll, getEmployeeById, updateEmployee,
+    getSkillsByEmployeeId, deleteSkill, updateSkill, getSkillById, getAllSkills
+}
