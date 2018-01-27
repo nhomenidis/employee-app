@@ -37,7 +37,7 @@ class EmployeeDashboard extends Component {
             firstName: response.firstName,
             lastName: response.lastName,
             email: response.email,
-            birthDate: response.birthDate,
+            birthDate: response.DateOfBirth,
             address: response.address,
             showEditModal: true
         })
@@ -48,6 +48,8 @@ class EmployeeDashboard extends Component {
         this.setState({ showAddSkillModal: true })
         this.setState({ employeeId: employeeId })
     };
+
+    
 
     _createEmployee = async () => {
         const request = {
@@ -61,15 +63,26 @@ class EmployeeDashboard extends Component {
 
         const response = await createEmployee(request);
 
-        const skillRequest = {
+        if ( response == null){
+            alert('Please complete the fields properly to create an employee!');
+            return;
+        }
+        
+        if (this.state.Name == '') {
+            alert('Employee without skills was successfully created!!');
+            this.setState({showModal: false});
+        }
+        else {
+            const skillRequest = {
 
             Name: this.state.Name,
             Category: this.state.Category,
             employeeId: response.employeeId
         };
-        await createSkill(skillRequest)
+            await createSkill(skillRequest)
             .then(alert('Employee with skills was successfully created!!'));
         this.setState({ showModal: false });
+        }
     }
 
 
@@ -80,10 +93,14 @@ class EmployeeDashboard extends Component {
             lastName: this.state.lastName,
             email: this.state.email,
             address: this.state.address,
-            birthDate: this.state.birthDate,
+            DateOfBirth: this.state.birthDate,
         };
 
-        await updateEmployee(request.employeeId, request);
+        var response = await updateEmployee(request.employeeId, request);
+        if ( response == null){
+            alert('Please complete the fields properly to update an employee!');
+            return;
+        }
         alert('Employee was updated successfully!!');
         this.setState({showEditModal: false});
     }
@@ -137,35 +154,35 @@ class EmployeeDashboard extends Component {
                     <li><ControlLabel>First Name</ControlLabel>
                         <FormControl
                             type="text"
-                            value={this.state.firstName}
+                            value={undefined}
                             placeholder="Enter first name"
                             onChange={(e) => this.setState({ firstName: e.target.value })}
                         /></li>
                     <li><ControlLabel>Last Name</ControlLabel>
                         <FormControl
                             type="text"
-                            value={this.state.lastName}
+                            value={undefined}
                             placeholder="Enter last name"
                             onChange={(e) => this.setState({ lastName: e.target.value })}
                         /></li>
                     <li><ControlLabel>Email</ControlLabel>
                         <FormControl
                             type="email"
-                            value={this.state.email}
+                            value={undefined}
                             placeholder="Enter valid email"
                             onChange={(e) => this.setState({ email: e.target.value })}
                         /></li>
                     <li><ControlLabel>Address</ControlLabel>
                         <FormControl
                             type="text"
-                            value={this.state.address}
+                            value={undefined}
                             placeholder="Enter address"
                             onChange={(e) => this.setState({ address: e.target.value })}
                         /></li>
                     <li><ControlLabel>Birth Date</ControlLabel>
                         <FormControl
                             type="date"
-                            value={this.state.birthDate}
+                            value={undefined}
                             placeholder="Enter birth date"
                             onChange={(e) => this.setState({ birthDate: e.target.value })}
                         /></li>
@@ -185,7 +202,7 @@ class EmployeeDashboard extends Component {
 
     _EditEmployeemodal = () => <Modal.Dialog>
         <Modal.Header>
-            <Modal.Title>Edit Employee</Modal.Title>
+            <Modal.Title>Edit Employee: {this.state.firstName.toString() + ' ' + this.state.lastName.toString()} </Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
@@ -282,7 +299,7 @@ class EmployeeDashboard extends Component {
 
     _AddSkillmodal = () => <Modal.Dialog>
         <Modal.Header>
-            <Modal.Title>Add Skill to Employee </Modal.Title>
+            <Modal.Title>Add Skill to Employee with id: {this.state.employeeId.toString()} </Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
