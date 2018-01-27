@@ -11,9 +11,9 @@ class SkillsGrid extends Component {
     }
 
     _columns = [
-        { key: 'Name', name: 'Skill Name', resizable: true },
-        { key: 'Category', name: 'Skill Category', resizable: true },
-        { key: 'actions', name: '', resizable: true },
+        { key: 'name', name: 'Skill Name', resizable: true },
+        { key: 'category', name: 'Skill Category', resizable: true },
+        { key: 'Skillactions', name: '', resizable: true },
     ];
 
     _handleEditClick(employeeId) {
@@ -29,14 +29,6 @@ class SkillsGrid extends Component {
         await this.refreshGrid();
     }
 
-    _actions = (employeeId) => <Row>
-        <Col sm={3}>
-            <Button bsStyle="primary" onClick={async () => await this._handleEditClick(employeeId)}>Edit</Button>
-        </Col>
-        <Col sm={3}>
-            <Button bsStyle="danger" onClick={async () => await this._deleteEmployee(employeeId)}>Delete</Button>
-        </Col>
-    </Row>
 
 
     render() {
@@ -46,7 +38,7 @@ class SkillsGrid extends Component {
                     columns={this._columns}
                     rowGetter={(i) => this.props.rows[i]}
                     rowsCount={this.props.rows.length}
-                    minHeight={500}
+                    minHeight={200}
                 />
             </div>
         )

@@ -9,9 +9,6 @@ class EmployeeGrid extends Component {
 
     constructor(props) {
         super(props);
-        this.state = {
-            skillRows: [],
-        };       
     }
  
     _columns = [ // id column hidden
@@ -21,7 +18,7 @@ class EmployeeGrid extends Component {
         { key: 'address', name: 'Address', resizable: true },
         { key: 'email', name: 'Email', resizable: true },
         { key: 'skills', name: 'Skills', resizable: true},
-        { key: 'actions', name: '', resizable: true },
+        { key: 'actions', name: '', resizable: true, width: 220 },
     ];
 
     _onRowSelect = (event) => {
@@ -31,14 +28,6 @@ class EmployeeGrid extends Component {
         // this.setState {skillRows: result}
     }
 
-    onRowsSelected = (rows) => {
-        this.setState({selectedIndexes: this.state.selectedIndexes.concat(rows.map(r => r.rowIdx))});
-      };
-    
-    onRowsDeselected = (rows) => {
-        let rowIndexes = rows.map(r => r.rowIdx);
-        this.setState({selectedIndexes: this.state.selectedIndexes.filter(i => rowIndexes.indexOf(i) === -1 )});
-      };
 
     render() {
         return (
@@ -47,21 +36,12 @@ class EmployeeGrid extends Component {
                 columns={this._columns}
                 rowGetter={(i) => this.props.rows[i]}
                 rowsCount={this.props.rows.length}
-                minHeight={500}
-                rowSelection={
-                    {
-                    showCheckbox: true,
-                    onRowsSelected: this._onRowsSelected,
-                    onRowsDeselected: this.onRowsDeselected,
-                    selectBy: {
-                      indexes: this.state.selectedIndexes
-                    }}
-                    }
-                    //this._onRowSelect,
+                minHeight={300}
+                //rowSelection= {this._onRowSelect}
 
             />
             <SkillsGrid
-                rows={this.state.skillRows}
+                rows={this.props.skillRows}
             />
             </div>
         )
