@@ -1,7 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Grid, Row, Col } from 'react-bootstrap'
 import ReactDataGrid from 'react-data-grid'
-import { getEmployees, deleteEmployee, createSkill, getSkillsByEmployeeId } from '../api/calls'
 
 class SkillsGrid extends Component {
 
@@ -15,20 +13,6 @@ class SkillsGrid extends Component {
         { key: 'category', name: 'Skill Category', resizable: true },
         { key: 'Skillactions', name: '', resizable: true },
     ];
-
-    _handleEditClick(employeeId) {
-        this.props.onEditClick(employeeId);
-    }
-
-    _handleSkillClick(employeeId) {
-        this.props.onCreateSkillClick(employeeId);
-    }
-
-    _deleteEmployee = async (employeeId) => {
-        await deleteEmployee(employeeId);
-        await this.refreshGrid();
-    }
-
 
 
     render() {
