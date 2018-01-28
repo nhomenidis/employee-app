@@ -2,7 +2,10 @@ import React, { Component } from 'react';
 import './employeeDashboard.css'
 import { Grid, Row, Col, Button, Jumbotron, Modal, Form, FormControl, ControlLabel } from 'react-bootstrap';
 import { EmployeeGrid } from './employeeGrid'
-import { createEmployee, createSkill, deleteAll, getEmployeeById, updateEmployee } from '../api/calls'
+import {
+    createEmployee, createSkill, deleteAll, getEmployeeById, updateEmployee,
+    deleteEmployee, getEmployees, getSkillsByEmployeeId, deleteSkill, updateSkill, getSkillById, getAllSkills
+} from '../api/calls'
 
 class EmployeeDashboard extends Component {
 
@@ -20,16 +23,69 @@ class EmployeeDashboard extends Component {
             Name: '',
             Category: '',
             employeeId: '',
+            skillId: '',
 
             showAddSkillModal: false,
-            showEditModal: false
+            showEditModal: false,
+            showEditSkillModal: false,
+
+            rows: [],
+            skillRows: []
         };
 
-        this.handleCreateSkillClick = this.handleCreateSkillClick.bind(this);
-        this.handleEditClick = this.handleEditClick.bind(this);
     }
 
-    handleEditClick = async (employeeId) => {
+    _actions = (employeeId) => <Row>
+        <Col sm={3}>
+            <Button bsStyle="primary" onClick={async () => await this._handleEditClick(employeeId)}>Edit</Button>
+        </Col>
+        <Col sm={3}>
+            <Button bsStyle="danger" onClick={async () => await this._deleteEmployee(employeeId)}>Delete</Button>
+        </Col>
+        <Col sm={6}>
+            <Button bsStyle="warning"  onClick={async () => await this._handleCreateSkillClick(employeeId)}>Add Skill</Button>
+        </Col>
+    </Row>
+
+    _showSkills = (employeeId) => <Row>
+        <Col sm={3}>
+            <Button bsStyle="primary" onClick={async () => await this._handleShowSkills(employeeId)}>Show Skills</Button>
+        </Col>
+    </Row>
+
+    _hideAllSkills = () => {
+        this.setState({
+            skillRows: []
+        })
+    }
+
+    _Skillactions = (skillId, employeeId) => <Row>
+        <Col sm={3}>
+            <Button bsStyle="primary" onClick={async () => await this._handleEditSkillClick(skillId, employeeId)}>Edit</Button>
+        </Col>
+        <Col sm={3}>
+            <Button bsStyle="danger" onClick={async () => await this._deleteSkill(skillId, employeeId)}>Delete</Button>
+        </Col>
+    </Row>
+
+
+
+    refreshGrid = async () => {
+        var response = await getEmployees();
+        response.forEach(element => {
+            element.actions = this._actions(element.employeeId);
+            element.skills = this._showSkills(element.employeeId);
+        });
+        this.setState({
+            rows: response
+        })
+    }
+
+    async componentDidMount() {
+        await this.refreshGrid();
+    }
+
+    _handleEditClick = async (employeeId) => {
 
         const response = await getEmployeeById(employeeId);
         this.setState({
@@ -37,17 +93,80 @@ class EmployeeDashboard extends Component {
             firstName: response.firstName,
             lastName: response.lastName,
             email: response.email,
-            birthDate: response.birthDate,
+            birthDate: response.DateOfBirth,
             address: response.address,
             showEditModal: true
         })
     };
 
-    handleCreateSkillClick = (employeeId) => {
+    _handleShowSkills = async (employeeId) => {
+        const response = await getSkillsByEmployeeId(employeeId);
+        response.forEach(element => {
+            element.Skillactions = this._Skillactions(element.skillId, element.employeeId);
+        })
+        this.setState({
+            skillRows: response,
+            Name: '',
+            Category: ''
+        })
+    }
+
+    _handleCreateSkillClick = (employeeId) => {
 
         this.setState({ showAddSkillModal: true })
         this.setState({ employeeId: employeeId })
     };
+
+    _handleEditSkillClick = async (skillId, employeeId) => {
+
+        const response = await getSkillById(skillId);
+        this.setState({
+            Name: response.name,
+            Category: response.category,
+            skillId: skillId,
+            employeeId: employeeId,
+
+            showEditSkillModal: true
+        },
+        )
+    }
+
+    _onSubmitEditSkillClick = async (skillId, employeeId) => {
+
+        const request = {
+            Name: this.state.Name,
+            Category: this.state.Category,
+            employeeId: employeeId,
+            skillId: skillId
+
+        }
+
+        const response = await updateSkill(skillId, request);
+        this.setState({
+            showEditSkillModal: false
+        })
+        await this._handleShowSkills(employeeId);
+    }
+
+    _deleteSkill = async (skillId, employeeId) => {
+
+        const response = await deleteSkill(skillId);
+        await this._handleShowSkills(employeeId);
+    }
+
+    _getAllSkills = async () => {
+        const response = await getAllSkills();
+        this.setState({
+            skillRows: response
+        })
+        await this.refreshGrid();
+    }
+
+    _deleteEmployee = async (employeeId) => {
+        await deleteEmployee(employeeId);
+        await this.refreshGrid();
+        this.setState({ skillRows: [] })
+    }
 
     _createEmployee = async () => {
         const request = {
@@ -61,15 +180,30 @@ class EmployeeDashboard extends Component {
 
         const response = await createEmployee(request);
 
-        const skillRequest = {
+        if (response == null) {
+            alert('Please complete the fields properly to create an employee!');
+            return;
+        }
 
-            Name: this.state.Name,
-            Category: this.state.Category,
-            employeeId: response.employeeId
-        };
-        await createSkill(skillRequest)
-            .then(alert('Employee with skills was successfully created!!'));
-        this.setState({ showModal: false });
+        if (this.state.Name == '') {
+            alert('Employee without skills was successfully created!!');
+            this.setState({ showModal: false });
+        }
+        else {
+            const skillRequest = {
+
+                Name: this.state.Name,
+                Category: this.state.Category,
+                employeeId: response.employeeId
+            };
+            await createSkill(skillRequest)
+                .then(alert('Employee with skills was successfully created!!'));
+            this.setState({
+                showModal: false,
+            }
+            );
+        }
+        await this.refreshGrid();
     }
 
 
@@ -80,18 +214,23 @@ class EmployeeDashboard extends Component {
             lastName: this.state.lastName,
             email: this.state.email,
             address: this.state.address,
-            birthDate: this.state.birthDate,
+            DateOfBirth: this.state.birthDate,
         };
 
-        await updateEmployee(request.employeeId, request);
+        var response = await updateEmployee(request.employeeId, request);
+        if (response == null) {
+            alert('Please complete the fields properly to update an employee!');
+            return;
+        }
         alert('Employee was updated successfully!!');
-        this.setState({showEditModal: false});
+        this.setState({ showEditModal: false });
+        await this.refreshGrid();
     }
 
 
     _deleteAllEmployees = async () => {
         await deleteAll();
-        await this.refreshGrid;
+        await this.refreshGrid();
     }
 
     _createSkill = async () => {
@@ -112,7 +251,10 @@ class EmployeeDashboard extends Component {
             employeeId: this.state.employeeId
         };
 
-        await createSkill(skillRequest);
+        var response = await createSkill(skillRequest);
+        if (response == null) {
+            return;
+        }
         this.setState({ showAddSkillModal: false });
         alert('skill was added succesfully');
     }
@@ -137,35 +279,35 @@ class EmployeeDashboard extends Component {
                     <li><ControlLabel>First Name</ControlLabel>
                         <FormControl
                             type="text"
-                            value={this.state.firstName}
+                            value={undefined}
                             placeholder="Enter first name"
                             onChange={(e) => this.setState({ firstName: e.target.value })}
                         /></li>
                     <li><ControlLabel>Last Name</ControlLabel>
                         <FormControl
                             type="text"
-                            value={this.state.lastName}
+                            value={undefined}
                             placeholder="Enter last name"
                             onChange={(e) => this.setState({ lastName: e.target.value })}
                         /></li>
                     <li><ControlLabel>Email</ControlLabel>
                         <FormControl
                             type="email"
-                            value={this.state.email}
+                            value={undefined}
                             placeholder="Enter valid email"
                             onChange={(e) => this.setState({ email: e.target.value })}
                         /></li>
                     <li><ControlLabel>Address</ControlLabel>
                         <FormControl
                             type="text"
-                            value={this.state.address}
+                            value={undefined}
                             placeholder="Enter address"
                             onChange={(e) => this.setState({ address: e.target.value })}
                         /></li>
                     <li><ControlLabel>Birth Date</ControlLabel>
                         <FormControl
                             type="date"
-                            value={this.state.birthDate}
+                            value={undefined}
                             placeholder="Enter birth date"
                             onChange={(e) => this.setState({ birthDate: e.target.value })}
                         /></li>
@@ -185,7 +327,7 @@ class EmployeeDashboard extends Component {
 
     _EditEmployeemodal = () => <Modal.Dialog>
         <Modal.Header>
-            <Modal.Title>Edit Employee</Modal.Title>
+            <Modal.Title>Edit Employee: {this.state.firstName.toString() + ' ' + this.state.lastName.toString()} </Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
@@ -249,14 +391,14 @@ class EmployeeDashboard extends Component {
                     <li><ControlLabel>Name</ControlLabel>
                         <FormControl
                             type="text"
-                            value={this.state.Name}
+                            value={undefined}
                             placeholder="Enter skill name"
                             onChange={(e) => this.setState({ Name: e.target.value })}
                         /></li>
                     <li><ControlLabel>Category</ControlLabel>
                         <FormControl
                             type="text"
-                            value={this.state.Category}
+                            value={undefined}
                             placeholder="Enter skill type"
                             onChange={(e) => this.setState({ Category: e.target.value })}
                         /></li>
@@ -282,7 +424,7 @@ class EmployeeDashboard extends Component {
 
     _AddSkillmodal = () => <Modal.Dialog>
         <Modal.Header>
-            <Modal.Title>Add Skill to Employee </Modal.Title>
+            <Modal.Title>Add Skill to Employee with id: {this.state.employeeId.toString()} </Modal.Title>
         </Modal.Header>
 
         <Modal.Body>
@@ -291,14 +433,14 @@ class EmployeeDashboard extends Component {
                     <li><ControlLabel>Name</ControlLabel>
                         <FormControl
                             type="text"
-                            value={this.state.Name}
+                            value={undefined}
                             placeholder="Enter skill name"
                             onChange={(e) => this.setState({ Name: e.target.value })}
                         /></li>
                     <li><ControlLabel>Category</ControlLabel>
                         <FormControl
                             type="text"
-                            value={this.state.Category}
+                            value={undefined}
                             placeholder="Enter skill type"
                             onChange={(e) => this.setState({ Category: e.target.value })}
                         /></li>
@@ -322,6 +464,40 @@ class EmployeeDashboard extends Component {
 
     </Modal.Dialog>
 
+    _EditSkillmodal = () => <Modal.Dialog>
+        <Modal.Header>
+            <Modal.Title>Edit Skill </Modal.Title>
+        </Modal.Header>
+
+        <Modal.Body>
+            <Form>
+                <ul>
+                    <li><ControlLabel>Name</ControlLabel>
+                        <FormControl
+                            type="text"
+                            value={this.state.Name}
+                            placeholder="Enter skill name"
+                            onChange={(e) => this.setState({ Name: e.target.value })}
+                        /></li>
+                    <li><ControlLabel>Category</ControlLabel>
+                        <FormControl
+                            type="text"
+                            value={this.state.Category}
+                            placeholder="Enter skill type"
+                            onChange={(e) => this.setState({ Category: e.target.value })}
+                        /></li>
+                </ul>
+            </Form>
+
+        </Modal.Body>
+
+        <Modal.Footer>
+            <Button onClick={async () => await this._onSubmitEditSkillClick(this.state.skillId, this.state.employeeId)}>Submit</Button>
+            <Button onClick={() => this.setState({ showEditSkillModal: false })}>Cancel</Button>
+        </Modal.Footer>
+
+    </Modal.Dialog>
+
     render() {
         return (
             <div>
@@ -329,6 +505,7 @@ class EmployeeDashboard extends Component {
                 {this.state.showEditModal === true ? this._EditEmployeemodal() : null}
                 {this.state.showSkillModal === true ? this._Skillmodal() : null}
                 {this.state.showAddSkillModal === true ? this._AddSkillmodal() : null}
+                {this.state.showEditSkillModal === true ? this._EditSkillmodal() : null}
                 <Grid>
                     <Row className='show-grid'>
                         <Col md={12}>
@@ -349,14 +526,16 @@ class EmployeeDashboard extends Component {
                             <EmployeeGrid
                                 onCreateSkillClick={this.handleCreateSkillClick}
                                 onEditClick={this.handleEditClick}
+                                rows={this.state.rows}
+                                skillRows={this.state.skillRows}
                             />
                         </Col>
                     </Row>
                     <Row className='other-functions'>
                         <Col md={10}>
-                            <Button bsStyle="primary" onClick={async () => await this._deleteAllEmployees()}>Delete All Employees</Button>
-                            <Button bsStyle="primary" >Find skills by Employee</Button>
-                            <Button bsStyle="primary" >Show all skills</Button>
+                            <Button bsStyle="warning" onClick={async () => await this._deleteAllEmployees()}>Delete All Employees</Button>
+                            <Button bsStyle="info" onClick={async () => await this._getAllSkills()}> Show all skills </Button>
+                            <Button bsStyle="success" onClick={async () => await this._hideAllSkills()}> Hide all skills </Button>
                         </Col>
                     </Row>
                 </Grid>

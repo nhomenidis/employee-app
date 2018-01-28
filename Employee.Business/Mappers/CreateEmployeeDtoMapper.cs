@@ -13,7 +13,7 @@ namespace Employee.Business.Mappers
                 LastName = employeeDto.LastName,
                 Email = employeeDto.Email,
                 Address = employeeDto.Address,
-                DateOfBirth = employeeDto.DateOfBirth,
+                DateOfBirth = employeeDto.BirthDate
             };
         }
 

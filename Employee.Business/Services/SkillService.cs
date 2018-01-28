@@ -14,6 +14,7 @@ namespace Employee.Business.Services
         Task<SkillDto> CreateNewSkill(CreateSkillDto createSkillDto);
         Task<bool> CreateManyNewSkills(IEnumerable<CreateSkillDto> createSkillDtos);
         Task<IEnumerable<SkillDto>> GetSkillsByEmployeeId(Guid emplloyeeId);
+        Task<SkillDto> UpdateSkill(Guid id, SkillDto skillDto);
     }
 
     public class SkillService : BaseService<Skill,SkillDto>, ISkillService
@@ -22,17 +23,20 @@ namespace Employee.Business.Services
         private readonly IEmployeeRepository _employeeRepository;
         private readonly IMapper<Skill, SkillDto> _skillMapper;
         private readonly IMapper<CreateSkillDto, Skill> _createSkillMapper;
+        private readonly IMapper<SkillDto, Skill> _skillDtoMapper;
 
         public SkillService(
                             ISkillRepository skillRepository,
                             IEmployeeRepository employeeRepository,
                             IMapper<Skill, SkillDto> skillMapper,
+                            IMapper<SkillDto, Skill> skillDtoMapper,
                             IMapper<CreateSkillDto, Skill> createSkillMapper) : base(skillRepository, skillMapper)
         {
             _skillRepository = skillRepository;
             _employeeRepository = employeeRepository;
             _skillMapper = skillMapper;
             _createSkillMapper = createSkillMapper;
+            _skillDtoMapper = skillDtoMapper;
         }
 
         public async Task<SkillDto> CreateNewSkill(CreateSkillDto createSkillDto)
@@ -74,6 +78,14 @@ namespace Employee.Business.Services
         {
             var skills = await  _skillRepository.GetSkillsByEmployeeId(emplloyeeId);
             return _skillMapper.Map(skills);
+        }
+
+        public async Task<SkillDto> UpdateSkill(Guid id, SkillDto skillDto)
+        {
+            skillDto.SkillId = id;
+            var mapped = _skillDtoMapper.Map(skillDto);
+            var updatedSkill = await _skillRepository.Update(id, mapped);
+            return _skillMapper.Map(updatedSkill);
         }
     }
 }
