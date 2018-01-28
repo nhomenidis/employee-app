@@ -14,6 +14,9 @@
 
 ### For Web:
 
+install latest version of Nodejs
+https://nodejs.org/en/ 
+
 Open command line and run the following commands:
 
 ```sh
